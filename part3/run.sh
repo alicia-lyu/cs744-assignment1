@@ -12,9 +12,9 @@ fi
 # Make sure /part3/datadir exists
 
 if [ $2 == "web-BerkStan.txt" ]; then
-    $dir_by_data="/part3/web"
+    dir_by_data="/part3/web"
 elif [ $2 == "enwiki-pages-articles" ]; then
-    $dir_by_data="/part3/wiki"
+    dir_by_data="/part3/wiki"
 else
     echo "Invalid data"
     exit 1
@@ -32,8 +32,8 @@ if ! hadoop fs -test -d $dir_by_data/task$1 ; then
 fi
 
 # Make sure data file is in hdfs
-if ! hadoop fs -test -e /part3/task1/web-BerkStan.txt ; then
-	hadoop fs -copyFromLocal /mnt/data/datasets/web-BerkStan.txt /data/
+if ! hadoop fs -test -e /part3/task1/$2 ; then
+	hadoop fs -copyFromLocal /mnt/data/datasets/$2 /data/
 	echo "hadoop fs copyFromLocal"
 fi
 
