@@ -13,6 +13,7 @@ spark = SparkSession\
 lines = spark.read.text(sys.argv[1]).rdd.map(lambda line:line[0]).filter(lambda line: not line.startswith("#"))
 
 # Map each line to a tuple of two integers, remove duplicates, group by key, and cache the result
+lines = lines.repartition(12)
 edges = lines.map(lambda x: x.split("\t")).map(lambda x: (int(x[0]), int(x[1]))).distinct().groupByKey().cache()
 
 # Initialize PageRank values for each URL
