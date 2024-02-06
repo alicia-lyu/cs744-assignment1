@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # $1: task_num
-# $2: data file/dir name, either web-BerkStan.txt or enwiki-pages-articles
-
+# $2: data file/dir name, either  or enwiki-pages-articles
 # Make sure /part3 exists
 if ! hadoop fs -test -d /part3 ; then
     hadoop fs -mkdir /part3
@@ -39,5 +38,5 @@ fi
 
 # spark-submit
 /mnt/data/spark-3.3.4-bin-hadoop3/bin/spark-submit \
-  main.py \
+  task$1.py \
   "hdfs://10.10.1.1:9000/data/$2" "hdfs://10.10.1.1:9000/$dir_by_data/task$1/output" 
