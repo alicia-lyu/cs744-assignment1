@@ -11,9 +11,9 @@ fi
 
 # Make sure /part3/datadir exists
 
-if [ $2 = "web-BerkStan.txt" ]; then
+if [ "$2" = "web-BerkStan.txt" ]; then
     dir_by_data="/part3/web"
-elif [ $2 = "enwiki-pages-articles" ]; then
+elif [ "$2" = "enwiki-pages-articles" ]; then
     dir_by_data="/part3/wiki"
 else
     echo "Invalid data"
