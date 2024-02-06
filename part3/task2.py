@@ -9,8 +9,13 @@ def calculate_contributions(edges_with_rank):
 
 # Create a SparkSession
 spark = SparkSession.builder.appName("PythonPageRank").getOrCreate()
-data_frame = spark.read.text(sys.argv[1])
+# Add partition
+if (sys.argv[1].endswith(".txt")):
+    partition_num = 6
+else:
+    partition_num = 12
 
+data_frame = spark.read.text(sys.argv[1]).repartition(partition_num)
 # Convert to an RDD, and filter out lines starting with '#'
 lines = data_frame.rdd.map(lambda line:line[0]).filter(lambda line: not line.startswith("#"))
 
