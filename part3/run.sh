@@ -46,5 +46,6 @@ fi
 
 # spark-submit
 /mnt/data/spark-3.3.4-bin-hadoop3/bin/spark-submit \
+  --py-files ./task.py,./tools.py \
   main.py \
   $1 "hdfs://10.10.1.1:9000/data/$2" "hdfs://10.10.1.1:9000/$dir_by_data/task$1"
