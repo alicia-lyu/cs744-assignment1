@@ -5,7 +5,7 @@ def task_big(task_num, experiment_num, output_dir):
 
     if task_num == 2:
         partition_edges = 3**(experiment_num+1)
-    elif task_num == 3:
+    else:
         partition_edges = 3**6 # 729: Maximum number of partitions in task 2
     
     # Create a SparkSession and read the data into an RDD
