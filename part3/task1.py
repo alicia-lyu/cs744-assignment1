@@ -39,7 +39,7 @@ for iteration in range(10):
     ranks = contributions.reduceByKey(add).mapValues(lambda rank: rank * beta + 1 - beta)
 
 # Save the output file
-outputDF = ranks.toDF()
+outputDF = ranks.map(lambda x: (x[0], str(x[1]))).toDF(["node", "rank"])
 outputDF.write.option("overwrite", True).text(sys.argv[2])
 
 # Stop the SparkSession
