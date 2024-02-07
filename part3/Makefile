@@ -22,7 +22,7 @@ run-wiki:
 
 run-big:
 	./run_big.sh 3 1
-	for i in {1..5}; do ./run_big.sh 2 $(i); done
+	@for i in {5..1}; do ./run_big.sh 2 $$i; done
 	./run_big.sh 1 1
 	
 
@@ -30,6 +30,3 @@ run-all:
 	make run-all-web
 	make run-all-wiki
 	make run-big
-
-test:
-    @for i in {5..1}; do echo $$i; done
