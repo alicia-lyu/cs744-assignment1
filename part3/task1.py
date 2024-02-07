@@ -40,7 +40,7 @@ for iteration in range(10):
 
 # Save the output file
 outputDF = ranks.map(lambda x: (x[0], str(x[1]))).toDF(["node", "rank"])
-outputDF.write.option("overwrite", True).text(sys.argv[2])
+outputDF.write.option("overwrite", True).csv(sys.argv[2])
 
 # Stop the SparkSession
 spark.stop()
