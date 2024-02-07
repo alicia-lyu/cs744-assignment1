@@ -45,5 +45,5 @@ fi
 
 # spark-submit
 /mnt/data/spark-3.3.4-bin-hadoop3/bin/spark-submit \
-  task$1.py \
+  ./deprecated/task$1.py \
   "hdfs://10.10.1.1:9000/data/$2" "hdfs://10.10.1.1:9000/$dir_by_data/task$1/output" 
