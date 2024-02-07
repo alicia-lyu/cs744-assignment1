@@ -2,10 +2,18 @@ from pyspark.sql import SparkSession
 from operator import add
 import sys
 
-def calculate_contributions(edges_with_rank):
-    node, (neighbors, rank) = edges_with_rank
-    contributions = [(neighbor, rank / len(neighbors)) for neighbor in neighbors]
-    return contributions
+def get_contribution_per_edge(edge_with_params):
+    node, (neighbor, params) = edge_with_params
+    out_degree, rank = params
+    return (neighbor, rank / out_degree)
+
+def pretreat(line):
+    line = line[0]
+    words = line.split()
+    if len(words) == 1:
+        edge = ("#", words[0])
+    edge = (words[0], words[1])
+    return edge
 
 # Create a SparkSession
 if (sys.argv[1].endswith(".txt")):
@@ -14,29 +22,25 @@ else:
     data_name = "wiki"
 
 spark = SparkSession.builder.appName("PageRank-Task1-%s" % data_name).getOrCreate()
-data_frame = spark.read.text(sys.argv[1])
+rdd = spark.read.text(sys.argv[1]).rdd
 
 # Convert to an RDD, and filter out lines starting with '#'
-lines = data_frame.rdd.map(lambda line:line[0]).filter(lambda line: not line.startswith("#"))
+edges = rdd.map(pretreat).filter(lambda x: not x[0] == "#")
+nodes = edges.flatMap(lambda edge: [edge[0], edge[1]]).distinct()
 
-# Map each line to a tuple of two integers, remove duplicates, group by key
-pairs = lines.map(lambda x: x.split("\t")).map(lambda x: (x[0], x[1])).distinct()
-edges = pairs.groupByKey() # (node, [neighbors])
-
-# Initialize PageRank values for each node
-ranks = edges.map(lambda x: (x[0], 1.0))
+ranks = nodes.map(lambda x: (x, 1.0)) # (node, rank=1.0)
+out_degrees = edges.map(lambda x: (x[0], 1)).reduceByKey(add) # (node, number of neighbors)
 
 # Set the damping factor (beta)
 beta = 0.85
 
 # Perform a single iteration of PageRank algorithm
 for iteration in range(10):
-    # Calculate contributions from each node to the rank of neighbors
-    edges_with_rank = edges.join(ranks)
-    contributions = edges_with_rank.flatMap(calculate_contributions)
-    # (neighbor, the contribution of node to the rank of each neighbor)
-    # Re-calculate node ranks based on neighbor contributions
-    ranks = contributions.reduceByKey(add).mapValues(lambda rank: rank * beta + 1 - beta)
+    params = out_degrees.join(ranks) # (node, (out_degree, newest_rank))
+    edges_with_params = edges.join(params) # (node, (neighbor, (out_degree, rank)))
+    contribution_per_edge = edges_with_params.map(get_contribution_per_edge)
+    contribution_sum = contribution_per_edge.reduceByKey(add)
+    ranks = contribution_sum.mapValues(lambda rank: rank * beta + 1 - beta)
 
 # Save the output file
 outputDF = ranks.map(lambda x: (x[0], str(x[1]))).toDF(["node", "rank"])
