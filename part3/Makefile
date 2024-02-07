@@ -1,11 +1,11 @@
 test-1:
-	./run.sh 1 web-BerkStan.txt
+	-./run.sh 1 web-BerkStan.txt
 
 test-2:
-	./run.sh 2 web-BerkStan.txt
+	-./run.sh 2 web-BerkStan.txt
 
 test-3:
-	./run.sh 3 web-BerkStan.txt
+	-./run.sh 3 web-BerkStan.txt
 
 run-web:
 	make test-1
@@ -13,17 +13,17 @@ run-web:
 	make test-3
 
 test-wiki:
-	./run.sh 3 enwiki-pages-articles
+	-./run.sh 3 enwiki-pages-articles
 
 run-wiki:
-	./run.sh 1 enwiki-pages-articles
-	./run.sh 2 enwiki-pages-articles
-	./run.sh 3 enwiki-pages-articles
+	-./run.sh 1 enwiki-pages-articles
+	-./run.sh 2 enwiki-pages-articles
+	-./run.sh 3 enwiki-pages-articles
 
 run-big:
-	./run_big.sh 3 1
-	@for i in {5..1}; do ./run_big.sh 2 $$i; done
-	./run_big.sh 1 1
+	-./run_big.sh 3 1
+	-@for i in {5..1}; do ./run_big.sh 2 $$i; done
+	-./run_big.sh 1 1
 	
 
 run-all:
