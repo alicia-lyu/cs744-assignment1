@@ -15,7 +15,10 @@ def pretreat(line):
 
 def page_rank(rdd, task_num, partition_edges, output_dir, iteration_num):
     if task_num >= 2:
-        rdd = rdd.repartition(partition_edges)
+        if partition_edges > 3**6:
+            pass
+        else:
+            rdd = rdd.repartition(partition_edges)
 
     # Convert lines into edges and neighbor_lists
     edges = rdd.map(pretreat).filter(lambda x: not x[0] == None).distinct()
