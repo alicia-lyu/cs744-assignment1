@@ -12,6 +12,9 @@ run-all-web:
 	make test-2
 	make test-3
 
+test-wiki:
+	./run.sh 1 enwiki-pages-articles
+
 run-all-wiki:
 	./run.sh 1 enwiki-pages-articles
 	./run.sh 2 enwiki-pages-articles

@@ -16,7 +16,8 @@ def pretreat(line):
     return edge
 
 # Create a SparkSession and read the data into an RDD
-if (sys.argv[1].endswith(".txt")):
+data_file_name = sys.argv[1]
+if (data_file_name.endswith(".txt")):
     data_name = "web"
     partition_edges = 6
     partition_nodes = 1
@@ -26,10 +27,12 @@ else:
     partition_nodes = 3
 
 spark = SparkSession.builder.appName("PageRank-Task2-%s" % data_name).getOrCreate()
-rdd = spark.read.text(sys.argv[1]).rdd.repartition(partition_edges)
+rdd = spark.read.text(data_file_name).rdd.repartition(partition_edges)
 
 # Convert lines into edges and nodes
-edges = rdd.map(pretreat).filter(lambda x: not x[0] == "#")
+edges = rdd.map(pretreat)
+if (data_file_name.endswith(".txt")):
+    edges = edges.filter(lambda x: not x[0] == "#")
 nodes = edges.flatMap(lambda edge: [edge[0], edge[1]]).distinct().repartition(partition_nodes)
 
 # Initialize the ranks 
