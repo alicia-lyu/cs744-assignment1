@@ -34,5 +34,5 @@ fi
 
 # spark-submit
 /mnt/data/spark-3.3.4-bin-hadoop3/bin/spark-submit \
-  ./main.py \
+  ./main_big.py \
   $1 $2 "hdfs://10.10.1.1:9000/part3/big/task$1/experiment$2" 

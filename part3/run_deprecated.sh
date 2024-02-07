@@ -9,11 +9,6 @@ if ! hadoop fs -test -d /data ; then
     echo "hadoop fs mkdir data"
 fi
 
-# Make sure data exists
-if ! hadoop fs -test -d /data/$2 ; then
-    hadoop fs -copyFromLocal /mnt/data/datasets/$2 /data/$2
-fi
-
 # Make sure /part3 exists
 if ! hadoop fs -test -d /part3 ; then
     hadoop fs -mkdir /part3
@@ -21,6 +16,7 @@ if ! hadoop fs -test -d /part3 ; then
 fi
 
 # Make sure /part3/datadir exists
+
 if [ "$2" = "web-BerkStan.txt" ]; then
     dir_by_data="/part3/web"
 elif [ "$2" = "enwiki-pages-articles" ]; then
@@ -41,7 +37,13 @@ if ! hadoop fs -test -d $dir_by_data/task$1 ; then
     echo "hadoop fs mkdir task$1"
 fi
 
+# Make sure data file is in hdfs
+if ! hadoop fs -test -e /data/$2 ; then
+	hadoop fs -copyFromLocal /mnt/data/datasets/$2 /data/
+	echo "hadoop fs copyFromLocal"
+fi
+
 # spark-submit
 /mnt/data/spark-3.3.4-bin-hadoop3/bin/spark-submit \
-  main.py \
-  $1 "hdfs://10.10.1.1:9000/data/$2" "hdfs://10.10.1.1:9000/$dir_by_data/task$1"
+  task$1.py \
+  "hdfs://10.10.1.1:9000/data/$2" "hdfs://10.10.1.1:9000/$dir_by_data/task$1/output" 
