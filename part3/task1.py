@@ -29,7 +29,7 @@ rdd = spark.read.text(data_file_name).rdd
 
 # Convert lines into edges and nodes
 edges = rdd.map(pretreat).filter(lambda x: not x[0] == None)
-nodes = edges.flatMap(lambda edge: [edge[0], edge[1]]).distinct().toDF(["node"])
+nodes = edges.flatMap(lambda edge: [(edge[0]), (edge[1])]).distinct().toDF(["node"])
 
 # Initialize the ranks 
 ranks = nodes.map(lambda x: (x, 1.0)).toDF(["node", "rank"]) # (node, rank=1.0)
