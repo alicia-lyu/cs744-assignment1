@@ -10,8 +10,11 @@ if ! hadoop fs -test -d /data ; then
 fi
 
 # Make sure data exists
-if ! hadoop fs -test -d /data/$2 ; then
-    hadoop fs -copyFromLocal /mnt/data/datasets/$2 /data/$2
+if ! hadoop fs -test -e /data/web-BerkStan.txt ; then
+    hadoop fs -copyFromLocal /mnt/data/datasets/web-BerkStan.txt /data/web-BerkStan.txt
+fi
+if ! hadoop fs -test -d /data/enwiki-pages-articles ; then
+    hadoop fs -copyFromLocal /mnt/data/datasets/enwiki-pages-articles /data/enwiki-pages-articles
 fi
 
 # Make sure /part3 exists
