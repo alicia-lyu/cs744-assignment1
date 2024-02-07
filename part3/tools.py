@@ -27,6 +27,8 @@ def page_rank(rdd, task_num, partition_edges, output_dir):
     
     # Initialize the ranks
     ranks = neighbor_lists.map(lambda x: (x[0], 1.0)) # (node, rank=1.0)
+    if task_num >= 3:
+        ranks.cache()
 
     # Set the damping factor for pagerank update
     beta = 0.85
@@ -38,7 +40,8 @@ def page_rank(rdd, task_num, partition_edges, output_dir):
         contribution_per_edge = neighbor_lists_with_ranks.flatMap(get_contribution_per_edge) # (neighbor, contribution)
         # Sum the contributions for each neighbor
         contribution_sum = contribution_per_edge.reduceByKey(add)
-        ranks = contribution_sum.mapValues(lambda contribution_sum: contribution_sum * beta + 1 - beta)
+        ranks.unpersist()
+        ranks = contribution_sum.mapValues(lambda contribution_sum: contribution_sum * beta + 1 - beta).cache()
 
     # Save the output file
     outputDF = ranks.map(lambda x: (x[0], str(x[1]))).toDF(["node", "rank"])
