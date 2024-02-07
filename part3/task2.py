@@ -25,7 +25,7 @@ else:
     partition_edges = 24
     partition_nodes = 3
 
-spark = SparkSession.builder.appName("PageRank-Task1-%s" % data_name).getOrCreate()
+spark = SparkSession.builder.appName("PageRank-Task2-%s" % data_name).getOrCreate()
 rdd = spark.read.text(sys.argv[1]).rdd.repartition(partition_edges)
 
 # Convert lines into edges and nodes
