@@ -27,6 +27,6 @@ run-big:
 	
 
 run-all:
-	make run-all-web
-	make run-all-wiki
+	make run-web
+	make run-wiki
 	make run-big
