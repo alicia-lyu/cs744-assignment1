@@ -1,7 +1,14 @@
 #!/bin/bash
 
 # $1: task_num
-# $2: data file/dir name, either  or enwiki-pages-articles
+# $2: data file/dir name, either web-BerkStan.txt or enwiki-pages-articles
+
+# Make sure /data exists
+if ! hadoop fs -test -d /data ; then
+    hadoop fs -mkdir /data
+    echo "hadoop fs mkdir data"
+fi
+
 # Make sure /part3 exists
 if ! hadoop fs -test -d /part3 ; then
     hadoop fs -mkdir /part3
@@ -31,7 +38,7 @@ if ! hadoop fs -test -d $dir_by_data/task$1 ; then
 fi
 
 # Make sure data file is in hdfs
-if ! hadoop fs -test -e /part3/task1/$2 ; then
+if ! hadoop fs -test -e /data/$2 ; then
 	hadoop fs -copyFromLocal /mnt/data/datasets/$2 /data/
 	echo "hadoop fs copyFromLocal"
 fi
