@@ -13,19 +13,18 @@ def pretreat(line):
         return (None, words[0])
     return (words[0], words[1])
 
-def page_rank(rdd, task_num, partition_edges, partition_nodes, output_dir):
-    # TODO: Add cache()
+def page_rank(rdd, task_num, partition_edges, output_dir):
     if task_num >= 2:
         rdd = rdd.repartition(partition_edges)
 
     # Convert lines into edges and neighbor_lists
     edges = rdd.map(pretreat).filter(lambda x: not x[0] == None).distinct()
-    if task_num >= 3:
-        edges.cache()
     neighbor_lists = edges.groupByKey() # (node, [neighbors])
 
+    # OPTIMIZATION: neighbor_lists is a hot spot
     if task_num >= 2:
-        neighbor_lists = neighbor_lists.repartition(partition_nodes)
+        neighbor_lists = neighbor_lists.repartition(1)
+        # For efficient join
     if task_num >= 3:
         neighbor_lists.cache()
     

@@ -3,7 +3,6 @@ from func import page_rank
 
 def task_big(task_num, experiment_num, output_dir):
 
-    partition_nodes = 1
     if task_num == 2:
         partition_edges = 3**(experiment_num+1)
     elif task_num == 3:
@@ -14,7 +13,7 @@ def task_big(task_num, experiment_num, output_dir):
     rdd = spark.read.text("hdfs://10.10.1.1:9000/data/enwiki-pages-articles").rdd
     
     # Run the page rank algorithm
-    page_rank(rdd, task_num, partition_edges, partition_nodes, output_dir)
+    page_rank(rdd, task_num, partition_edges, output_dir)
 
     # Stop the SparkSession
     spark.stop()
