@@ -32,8 +32,15 @@ run-wiki:
 
 run-big:
 	-./run_big.sh 3 1
-	-@for i in {5..1}; do ./run_big.sh 2 $$i; done
 	-./run_big.sh 1 1
+	-make run-big-2
+
+run-big-2:
+	./run_big.sh 2 5
+	./run_big.sh 2 4
+	./run_big.sh 2 3
+	./run_big.sh 2 2
+	./run_big.sh 2 1
 
 run-all:
 	make run-web
