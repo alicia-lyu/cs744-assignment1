@@ -33,10 +33,10 @@ beta = 0.85
 for iteration in range(10):
     # Calculate contributions from each node to the rank of neighbors
     edges_with_rank = edges.join(ranks)
-    contributions = edges_with_rank.map(calculate_contributions) 
+    contributions = edges_with_rank.flatMap(calculate_contributions)
     # (neighbor, the contribution of node to the rank of each neighbor)
     # Re-calculate node ranks based on neighbor contributions
-    ranks = contributions.reduceByKey(add).map(lambda rank: rank * beta + 1 - beta)
+    ranks = contributions.reduceByKey(add).mapValues(lambda rank: rank * beta + 1 - beta)
 
 # Save the output file
 outputDF = ranks.toDF()
