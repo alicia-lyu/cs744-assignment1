@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession
-from func import page_rank
+from tools import page_rank
 
 def task(task_num, data_file_name, output_dir):
 
