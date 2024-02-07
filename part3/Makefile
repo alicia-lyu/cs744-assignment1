@@ -13,7 +13,7 @@ run-web:
 	make test-3
 
 test-wiki:
-	./run.sh 1 enwiki-pages-articles
+	./run.sh 3 enwiki-pages-articles
 
 run-wiki:
 	./run.sh 1 enwiki-pages-articles
@@ -21,11 +21,15 @@ run-wiki:
 	./run.sh 3 enwiki-pages-articles
 
 run-big:
-	./run_big.sh 1 1
-	for i in {1..5}; do ./run_big.sh 2 $$i; done
 	./run_big.sh 3 1
+	for i in {1..5}; do ./run_big.sh 2 $(i); done
+	./run_big.sh 1 1
+	
 
 run-all:
 	make run-all-web
 	make run-all-wiki
 	make run-big
+
+test:
+    @for i in {5..1}; do echo $$i; done
