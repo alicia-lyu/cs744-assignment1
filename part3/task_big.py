@@ -13,7 +13,7 @@ def task_big(task_num, experiment_num, output_dir):
     rdd = spark.read.text("hdfs://10.10.1.1:9000/data/enwiki-pages-articles").rdd
     
     # Run the page rank algorithm
-    page_rank(rdd, task_num, partition_edges, output_dir)
+    page_rank(rdd, task_num, partition_edges, output_dir, 3)
 
     # Stop the SparkSession
     spark.stop()

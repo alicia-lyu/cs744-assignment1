@@ -15,7 +15,7 @@ def task(task_num, data_file_name, output_dir):
     rdd = spark.read.text(data_file_name).rdd
     
     # Run the page rank algorithm
-    page_rank(rdd, task_num, partition_edges, output_dir)
+    page_rank(rdd, task_num, partition_edges, output_dir, 10)
 
     # Stop the SparkSession
     spark.stop()

@@ -13,7 +13,7 @@ def pretreat(line):
         return (None, words[0])
     return (words[0], words[1])
 
-def page_rank(rdd, task_num, partition_edges, output_dir):
+def page_rank(rdd, task_num, partition_edges, output_dir, iteration_num):
     if task_num >= 2:
         rdd = rdd.repartition(partition_edges)
 
@@ -33,7 +33,7 @@ def page_rank(rdd, task_num, partition_edges, output_dir):
     # Set the damping factor for pagerank update
     beta = 0.85
 
-    for iteration in range(10):
+    for iteration in range(iteration_num):
         # Add the rank to neighbor_lists for contribution calculation
         neighbor_lists_with_ranks = neighbor_lists.join(ranks) # (node, ([neighbors], rank))
         # Compute the contribution of each edge to the rank of the neighbor
