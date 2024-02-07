@@ -17,12 +17,11 @@ def task_big(task_num, experiment_num, output_dir):
             return (None, words[0])
         return (words[0], words[1])
 
+    partition_nodes = 1
     if task_num == 2:
         partition_edges = 3**(experiment_num+1)
-        partition_nodes = 3*(experiment_num+1)
     elif task_num == 3:
         partition_edges = 3**6 # 729: Maximum number of partitions in task 2
-        partition_nodes = 3*6 # 18
     
     # Create a SparkSession and read the data into an RDD
     spark = SparkSession.builder.appName("PageRank-wiki-Task%d-Experiment%d" % (task_num, experiment_num)).getOrCreate()
