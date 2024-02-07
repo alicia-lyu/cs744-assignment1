@@ -29,12 +29,12 @@ rdd = spark.read.text(data_file_name).rdd
 
 # Convert lines into edges and nodes
 edges = rdd.map(pretreat).filter(lambda x: not x[0] == None)
-nodes = edges.flatMap(lambda edge: [edge[0], edge[1]]).distinct()
+nodes = edges.flatMap(lambda edge: [edge[0], edge[1]]).distinct().toDF()
 
 # Initialize the ranks 
-ranks = nodes.map(lambda x: (x, 1.0)) # (node, rank=1.0)
+ranks = nodes.map(lambda x: (x, 1.0)).toDF() # (node, rank=1.0)
 # Calculate the out-degree of each node
-out_degrees = edges.map(lambda x: (x[0], 1)).reduceByKey(add) # (node, number of neighbors)
+out_degrees = edges.map(lambda x: (x[0], 1)).reduceByKey(add).toDF() # (node, number of neighbors)
 
 # Set the damping factor for pagerank update
 beta = 0.85
