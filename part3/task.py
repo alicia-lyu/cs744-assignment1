@@ -6,10 +6,10 @@ def task(task_num, data_file_name, output_dir):
     # Create a SparkSession and read the data into an RDD
     if (data_file_name.endswith(".txt")):
         data_name = "web"
-        partition_edges = 6
+        partition_edges = 15
     else:
         data_name = "wiki"
-        partition_edges = 24
+        partition_edges = 15**2
 
     spark = SparkSession.builder.appName("PageRank-Task%d-%s" % (task_num, data_name)).getOrCreate()
     rdd = spark.read.text(data_file_name).rdd
