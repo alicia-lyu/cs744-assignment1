@@ -1,6 +1,5 @@
 from pyspark.sql import SparkSession
 from operator import add
-from pyspark.sql.functions import broadcast
 
 def task_big(task_num, experiment_num, output_dir):
     
@@ -18,11 +17,12 @@ def task_big(task_num, experiment_num, output_dir):
             return (None, words[0])
         return (words[0], words[1])
 
-    partition_nodes = 1
     if task_num == 2:
         partition_edges = 3**(experiment_num+1)
+        partition_nodes = 3*(experiment_num+1)
     elif task_num == 3:
         partition_edges = 3**6 # 729: Maximum number of partitions in task 2
+        partition_nodes = 3*6 # 18
     
     # Create a SparkSession and read the data into an RDD
     spark = SparkSession.builder.appName("PageRank-wiki-Task%d-Experiment%d" % (task_num, experiment_num)).getOrCreate()
@@ -42,8 +42,6 @@ def task_big(task_num, experiment_num, output_dir):
     ranks = nodes.map(lambda x: (x, 1.0)) # (node, rank=1.0)
     # Calculate the out-degree of each node
     out_degrees = edges.map(lambda x: (x[0], 1)).reduceByKey(add) # (node, number of neighbors)
-    if task_num >= 2:
-        out_degrees = out_degrees.repartition(partition_nodes)
     if task_num >= 3:
         out_degrees.cache()
 
@@ -53,7 +51,7 @@ def task_big(task_num, experiment_num, output_dir):
     for iteration in range(10):
         # Add the rank and out_degree of node to each edge
         params = out_degrees.join(ranks) # (node, (out_degree, newest_rank))
-        edges_with_params = edges.join(broadcast(params)) # (node, (neighbor, (out_degree, rank)))
+        edges_with_params = edges.join(params) # (node, (neighbor, (out_degree, rank)))
         # Compute the contribution of each edge to the rank of the neighbor
         contribution_per_edge = edges_with_params.map(get_contribution_per_edge) # (neighbor, contribution)
         # Sum the contributions for each neighbor

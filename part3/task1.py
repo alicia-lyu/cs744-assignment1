@@ -1,7 +1,6 @@
 from pyspark.sql import SparkSession
 from operator import add
 import sys
-from pyspark.sql.functions import broadcast
 
 def get_contribution_per_edge(edge_with_params):
     node, (neighbor, params) = edge_with_params
@@ -29,12 +28,12 @@ rdd = spark.read.text(data_file_name).rdd
 
 # Convert lines into edges and nodes
 edges = rdd.map(pretreat).filter(lambda x: not x[0] == None)
-nodes = edges.flatMap(lambda edge: [edge[0], edge[1]]).map(lambda node: (node,)).toDF(["node"])
+nodes = edges.flatMap(lambda edge: [edge[0], edge[1]]).distinct()
 
 # Initialize the ranks 
-ranks = nodes.map(lambda x: (x, 1.0)).toDF(["node", "rank"]) # (node, rank=1.0)
+ranks = nodes.map(lambda x: (x, 1.0)) # (node, rank=1.0)
 # Calculate the out-degree of each node
-out_degrees = edges.map(lambda x: (x[0], 1)).reduceByKey(add).toDF(["node", "out_degree"]) # (node, number of neighbors)
+out_degrees = edges.map(lambda x: (x[0], 1)).reduceByKey(add) # (node, number of neighbors)
 
 # Set the damping factor for pagerank update
 beta = 0.85
@@ -42,7 +41,7 @@ beta = 0.85
 for iteration in range(10):
     # Add the rank and out_degree of node to each edge
     params = out_degrees.join(ranks) # (node, (out_degree, newest_rank))
-    edges_with_params = edges.join(broadcast(params)) # (node, (neighbor, (out_degree, rank)))
+    edges_with_params = edges.join(params) # (node, (neighbor, (out_degree, rank)))
     # Compute the contribution of each edge to the rank of the neighbor
     contribution_per_edge = edges_with_params.map(get_contribution_per_edge) # (neighbor, contribution)
     # Sum the contributions for each neighbor
