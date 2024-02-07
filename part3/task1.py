@@ -1,6 +1,7 @@
 from pyspark.sql import SparkSession
 from operator import add
 import sys
+from pyspark.sql.functions import broadcast
 
 def get_contribution_per_edge(edge_with_params):
     node, (neighbor, params) = edge_with_params
@@ -41,7 +42,7 @@ beta = 0.85
 for iteration in range(10):
     # Add the rank and out_degree of node to each edge
     params = out_degrees.join(ranks) # (node, (out_degree, newest_rank))
-    edges_with_params = edges.join(params) # (node, (neighbor, (out_degree, rank)))
+    edges_with_params = edges.join(broadcast(params)) # (node, (neighbor, (out_degree, rank)))
     # Compute the contribution of each edge to the rank of the neighbor
     contribution_per_edge = edges_with_params.map(get_contribution_per_edge) # (neighbor, contribution)
     # Sum the contributions for each neighbor

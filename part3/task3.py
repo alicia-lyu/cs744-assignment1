@@ -1,6 +1,8 @@
 from pyspark.sql import SparkSession
 from operator import add
 import sys
+from pyspark.sql.functions import broadcast
+
 
 def get_contribution_per_edge(edge_with_params):
     node, (neighbor, params) = edge_with_params
@@ -25,7 +27,7 @@ if (data_file_name.endswith(".txt")):
 else:
     data_name = "wiki"
     partition_edges = 24
-    partition_nodes = 3
+    partition_nodes = 1
 
 spark = SparkSession.builder.appName("PageRank-Task3-%s" % data_name).getOrCreate()
 rdd = spark.read.text(data_file_name).rdd.repartition(partition_edges)
@@ -47,7 +49,7 @@ beta = 0.85
 for iteration in range(10):
     # Add the rank and out_degree of node to each edge
     params = out_degrees.join(ranks) # (node, (out_degree, newest_rank))
-    edges_with_params = edges.join(params) # (node, (neighbor, (out_degree, rank)))
+    edges_with_params = edges.join(broadcast(params)) # (node, (neighbor, (out_degree, rank)))
     # Compute the contribution of each edge to the rank of the neighbor
     contribution_per_edge = edges_with_params.map(get_contribution_per_edge) # (neighbor, contribution)
     # Sum the contributions for each neighbor
