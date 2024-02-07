@@ -19,3 +19,7 @@ run-all-wiki:
 	./run.sh 1 enwiki-pages-articles
 	./run.sh 2 enwiki-pages-articles
 	./run.sh 3 enwiki-pages-articles
+
+run-all:
+	make run-all-web
+	make run-all-wiki
