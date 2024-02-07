@@ -42,6 +42,12 @@ run-big-2:
 	./run_big.sh 2 2
 	./run_big.sh 2 1
 
+
+rest:
+	./run_big.sh 4 1 # To drop a worker
+	./run_big.sh 3 2 # Comparing task 3 with task 1
+	./run_big.sh 2 1
+
 run-all:
 	make run-web
 	make run-wiki

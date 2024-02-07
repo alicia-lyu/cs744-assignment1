@@ -1,4 +1,5 @@
 from operator import add
+import datetime
 
 def get_contribution_per_edge(neighbor_lists_with_ranks):
     node, (neighbors, rank) = neighbor_lists_with_ranks
@@ -14,8 +15,19 @@ def pretreat(line):
     return (words[0], words[1])
 
 def page_rank(rdd, task_num, partition_edges, output_dir, iteration_num):
-    if task_num >= 2:
-        rdd = rdd.repartition(partition_edges)
+    if task_num == 1:
+        print("Default number of partitions: %d" % rdd.getNumPartitions())
+        try:
+            with open("./default_partitions.txt", "a") as f:
+                f.write("Default number of partitions: " + str(rdd.getNumPartitions()) \
+                        + ". At" + str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")) + "\n")
+        except:
+            print("Failed to write to default_partitions.txt")
+    else: # task_num == 2 or task_num == 3
+        if partition_edges > 3**6: # Task 3 Experiment 2
+            pass
+        else:
+            rdd = rdd.repartition(partition_edges)
 
     # Convert lines into edges and neighbor_lists
     edges = rdd.map(pretreat).filter(lambda x: not x[0] == None).distinct()
