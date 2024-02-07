@@ -22,9 +22,6 @@ def page_rank(rdd, task_num, partition_edges, output_dir):
     neighbor_lists = edges.groupByKey() # (node, [neighbors])
 
     # OPTIMIZATION: neighbor_lists is a hot spot
-    if task_num >= 2:
-        neighbor_lists = neighbor_lists.repartition(1)
-        # For efficient join
     if task_num >= 3:
         neighbor_lists.cache()
     
