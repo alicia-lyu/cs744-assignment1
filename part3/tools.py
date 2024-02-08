@@ -15,7 +15,7 @@ def pretreat(line):
     return (words[0], words[1])
 
 def page_rank(rdd, task_num, partition_edges, output_dir, iteration_num):
-    if task_num == 1:
+    if task_num in [1, 5]:
         print("Default number of partitions: %d" % rdd.getNumPartitions())
         try:
             with open("./default_partitions.txt", "a") as f:
@@ -23,24 +23,31 @@ def page_rank(rdd, task_num, partition_edges, output_dir, iteration_num):
                         + ". At" + str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")) + "\n")
         except:
             print("Failed to write to default_partitions.txt")
-    else: # task_num == 2 or task_num == 3
+    elif task_num in [2, 3]:
         if partition_edges > 3**6: # Task 3 Experiment 2
             pass
         else:
             rdd = rdd.repartition(partition_edges)
 
     # Convert lines into edges and neighbor_lists
-    edges = rdd.map(pretreat).filter(lambda x: not x[0] == None).distinct()
-    # TODO improvement: call dictinct() on neighbor_list after groupByKey()
-    neighbor_lists = edges.groupByKey() # (node, [neighbors])
+    if task_num < 5:
+        edges = rdd.map(pretreat).filter(lambda x: not x[0] == None).distinct()
+        neighbor_lists = edges.groupByKey() # (node, [neighbors])
+    else: # task_num == 5
+        # Optimization: remove duplicate edges within the neighbor_list of each node
+        edges = rdd.map(pretreat).filter(lambda x: not x[0] == None)
+        neighbor_lists = edges.groupByKey()
+        neighbor_lists = neighbor_lists.map(lambda x: (x[0], list(set(x[1]))))
+        neighbor_lists = neighbor_lists.partitionBy(partitionFunc=lambda x: hash(x))
 
     # OPTIMIZATION: neighbor_lists is a hot spot
-    if task_num >= 3:
+    if task_num == 3:
         neighbor_lists.cache()
-    # TODO improvement: copartition neighbor_lists and ranks
     # Initialize the ranks
     ranks = neighbor_lists.map(lambda x: (x[0], 1.0)) # (node, rank=1.0)
-    if task_num >= 3:
+    if task_num == 5:
+        ranks = ranks.partitionBy(partitionFunc=lambda x: hash(x))
+    if task_num == 3:
         ranks.cache()
 
     # Set the damping factor for pagerank update
@@ -53,8 +60,11 @@ def page_rank(rdd, task_num, partition_edges, output_dir, iteration_num):
         contribution_per_edge = neighbor_lists_with_ranks.flatMap(get_contribution_per_edge) # (neighbor, contribution)
         # Sum the contributions for each neighbor
         contribution_sum = contribution_per_edge.reduceByKey(add)
-        ranks.unpersist()
-        ranks = contribution_sum.mapValues(lambda contribution_sum: contribution_sum * beta + 1 - beta).cache()
+        if task_num == 3:
+            ranks.unpersist()
+        ranks = contribution_sum.mapValues(lambda contribution_sum: contribution_sum * beta + 1 - beta)
+        if task_num == 3:
+            ranks.cache()
 
     # Save the output file
     outputDF = ranks.map(lambda x: (x[0], str(x[1]))).toDF(["node", "rank"])
