@@ -59,7 +59,10 @@ def page_rank(rdd, task_num, partition_edges, output_dir, iteration_num):
         # Compute the contribution of each edge to the rank of the neighbor
         contribution_per_edge = neighbor_lists_with_ranks.flatMap(get_contribution_per_edge) # (neighbor, contribution)
         # Sum the contributions for each neighbor
-        contribution_sum = contribution_per_edge.reduceByKey(add)
+        if task_num == 5:
+            contribution_sum = contribution_per_edge.reduceByKey(add, partitionFunc=lambda x: hash(x))
+        else:
+            contribution_sum = contribution_per_edge.reduceByKey(add)
         if task_num == 3:
             ranks.unpersist()
         ranks = contribution_sum.mapValues(lambda contribution_sum: contribution_sum * beta + 1 - beta)
