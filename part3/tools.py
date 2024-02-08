@@ -31,12 +31,13 @@ def page_rank(rdd, task_num, partition_edges, output_dir, iteration_num):
 
     # Convert lines into edges and neighbor_lists
     edges = rdd.map(pretreat).filter(lambda x: not x[0] == None).distinct()
+    # TODO improvement: call dictinct() on neighbor_list after groupByKey()
     neighbor_lists = edges.groupByKey() # (node, [neighbors])
 
     # OPTIMIZATION: neighbor_lists is a hot spot
     if task_num >= 3:
         neighbor_lists.cache()
-    
+    # TODO improvement: copartition neighbor_lists and ranks
     # Initialize the ranks
     ranks = neighbor_lists.map(lambda x: (x[0], 1.0)) # (node, rank=1.0)
     if task_num >= 3:
