@@ -38,7 +38,7 @@ def page_rank(rdd, task_num, partition_edges, output_dir, iteration_num):
         edges = rdd.map(pretreat).filter(lambda x: not x[0] == None)
         neighbor_lists = edges.groupByKey()
         neighbor_lists = neighbor_lists.map(lambda x: (x[0], list(set(x[1]))))
-        neighbor_lists = neighbor_lists.partitionBy(partitionFunc=lambda x: hash(x))
+        neighbor_lists = neighbor_lists.partitionBy(None, partitionFunc=lambda x: hash(x))
 
     # OPTIMIZATION: neighbor_lists is a hot spot
     if task_num == 3:
@@ -46,7 +46,7 @@ def page_rank(rdd, task_num, partition_edges, output_dir, iteration_num):
     # Initialize the ranks
     ranks = neighbor_lists.map(lambda x: (x[0], 1.0)) # (node, rank=1.0)
     if task_num == 5:
-        ranks = ranks.partitionBy(partitionFunc=lambda x: hash(x))
+        ranks = ranks.partitionBy(None, partitionFunc=lambda x: hash(x))
     if task_num == 3:
         ranks.cache()
 
