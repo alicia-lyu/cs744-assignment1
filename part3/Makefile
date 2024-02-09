@@ -1,10 +1,10 @@
 run:
 	echo "Running task 1 with web-BerkStan.txt"
-	-./run 1 web-BerkStan.txt
+	-./run.sh 1 web-BerkStan.txt
 	echo "Running task 2 with web-BerkStan.txt"
-	-./run 2 web-BerkStan.txt
+	-./run.sh 2 web-BerkStan.txt
 	echo "Running task 3 with web-BerkStan.txt"
-	-./run 3 web-BerkStan.txt
+	-./run.sh 3 web-BerkStan.txt
 	echo "Task 4 is basically task 1, requiring you manually drop a worker"
 	echo "Skipping task 4 with web-BerkStan.txt"
 	echo "Running task 1 with enwiki-pages-articles"
